@@ -1,12 +1,19 @@
 package com.aiboomi.edupath.dtos;
 
 import java.time.LocalDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Student data transfer object")
 public class StudentDTO {
+    @Schema(description = "Internal database id", example = "1")
     private Long id;
+    @Schema(description = "External student id from source data / school", example = "S12345")
     private String studentExternalId;
+    @Schema(description = "Full name of the student", example = "Amit Kumar")
     private String name;
+    @Schema(description = "Numeric class (6-10)", example = "9")
     private Integer classNumber;
+    @Schema(description = "Date of birth of the student", example = "2010-05-12")
     private LocalDate dob;
 
     public StudentDTO() {}

@@ -2,13 +2,16 @@ package com.aiboomi.edupath.entities;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
 @Table(name = "academic_record", indexes = {@Index(columnList = "student_id, year, subject", name = "idx_academic_student_year_subject")})
+@Schema(description = "An academic record representing a student's marks in a subject for a given year")
 public class AcademicRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Internal id of the academic record")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -17,15 +20,19 @@ public class AcademicRecord {
     private Student student;
 
     @Column(name = "year")
+    @Schema(description = "Academic year (e.g., 2021)", example = "2023")
     private Integer year;
 
     @Column(name = "subject")
+    @Schema(description = "Subject name (e.g., Mathematics)", example = "Mathematics")
     private String subject;
 
     @Column(name = "marks")
+    @Schema(description = "Marks obtained by student", example = "78.0")
     private Double marks;
 
     @Column(name = "max_marks")
+    @Schema(description = "Maximum marks for this subject in that year (used to calculate percentiles)", example = "100.0")
     private Double maxMarks;
 
     public AcademicRecord() {

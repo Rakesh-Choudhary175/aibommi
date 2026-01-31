@@ -1,13 +1,16 @@
 package com.aiboomi.edupath.entities;
 
 import jakarta.persistence.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Entity
 @Table(name = "activity")
+@Schema(description = "Extracurricular activity record for a student")
 public class ExtracurricularActivity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Internal id of the activity record", example = "5")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -16,26 +19,33 @@ public class ExtracurricularActivity {
     private Student student;
 
     @Column(name = "year")
+    @Schema(description = "Year when the activity was performed", example = "2023")
     private Integer year;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
+    @Schema(description = "Activity category", example = "SPORTS")
     private ActivityCategory category;
 
     @Column(name = "name")
+    @Schema(description = "Activity name", example = "Inter-school Football")
     private String name;
 
     @Column(name = "metric_value")
+    @Schema(description = "Numeric metric (e.g., goals, score)", example = "5.0")
     private Double metricValue;
 
     @Column(name = "metric_unit")
+    @Schema(description = "Metric unit", example = "goals")
     private String metricUnit;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "level")
+    @Schema(description = "Competition level", example = "REGIONAL")
     private CompetitionLevel level;
 
     @Column(name = "remarks")
+    @Schema(description = "Optional remarks", example = "Captain")
     private String remarks;
 
     public ExtracurricularActivity() {

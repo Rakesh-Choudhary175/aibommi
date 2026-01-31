@@ -22,6 +22,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+
+	// OpenAPI / Swagger UI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+
 	// MySQL driver for runtime (explicit version)
 	runtimeOnly 'com.mysql:mysql-connector-j:8.1.0'
 	// Keep H2 available for fast in-memory tests
