@@ -137,16 +137,30 @@ const StudentProfile = () => {
           </div>
 
 
-          <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
             <button 
               className="login-btn" 
-              style={{ padding: '1rem 3rem', fontSize: '1.2rem' }}
+              style={{ padding: '1rem 2rem', fontSize: '1.1rem', background: 'var(--secondary-color)' }}
               onClick={() => navigate(`/student-profile/${studentId}/career`)}
             >
-              Suggest Career Path
+              View Career Report
+            </button>
+            <button 
+              className="login-btn" 
+              style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
+              onClick={() => setShowChat(true)}
+            >
+              Chat with AI
             </button>
           </div>
         </div>
+
+        {/* Chat Side Panel */}
+        {showChat && (
+          <div className="chat-panel">
+            <ChatWindow onClose={() => setShowChat(false)} />
+          </div>
+        )}
 
       </div>
     </div>

@@ -167,12 +167,12 @@ body, html {
 }
 
 .split-view .profile-card {
-  max-width: 60%;
+  max-width: 50%;
 }
 
 .chat-panel {
   flex: 1;
-  max-width: 35%;
+  max-width: 45%;
   animation: slideInRight 0.5s ease-out;
 }
 
@@ -188,7 +188,7 @@ body, html {
   -webkit-backdrop-filter: blur(10px);
   border: var(--glass-border);
   border-radius: 20px;
-  height: 600px;
+  height: 80vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -272,8 +272,8 @@ body, html {
 }
 
 .message.ai .message-bubble {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-light);
+  background: #ffffff;
+  color: #333333;
   border-bottom-left-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
