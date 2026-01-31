@@ -27,12 +27,13 @@ const ChatWindow = ({ onClose }) => {
           messages: [
             {
               role: "user",
-              content: "What should the best carear option for my future? Give output strictly in html format"
+              content: "What should the best carear option for my future? for now only suggest top 3 carear options. Give output strictly in html format"
             }
           ]
         });
         
         let responseText = response.data;
+        console.log(responseText);
         if (typeof responseText === 'object') {
              // Prioritize 'reply' field as per new user example
              responseText = responseText.reply || responseText.content || responseText.message || responseText.html || JSON.stringify(responseText);
@@ -44,10 +45,14 @@ const ChatWindow = ({ onClose }) => {
           responseText = responseText.replace(/```html/g, '').replace(/```/g, '');
           
           // Clean literal newlines if they are escaped sequences like "\n" 
-          // (The previous user request was specifically about removing "/n" which I interpreted as literal encoded newlines)
           responseText = responseText.replace(/\\n/g, ' '); 
 
-          // Extract body content if present to avoid nested html/head tags
+          // 1. Remove dangerous tags globally (style, script, link, meta, title, head)
+          //    We use a regex that matches these tags and their content case-insensitively.
+          const dangerousTagsRegex = /<(style|script|link|meta|title|head)[^>]*>[\s\S]*?<\/\1>/gi;
+          responseText = responseText.replace(dangerousTagsRegex, '');
+
+          // 2. Extract body content if present
           const bodyMatch = responseText.match(/<body[^>]*>([\s\S]*)<\/body>/i);
           if (bodyMatch && bodyMatch[1]) {
             responseText = bodyMatch[1];
@@ -102,6 +107,7 @@ const ChatWindow = ({ onClose }) => {
       });
 
       let responseText = response.data;
+      console.log(responseText);
       if (typeof responseText === 'object') {
            responseText = responseText.reply || responseText.content || responseText.message || responseText.html || JSON.stringify(responseText);
       }
@@ -111,6 +117,11 @@ const ChatWindow = ({ onClose }) => {
         responseText = responseText.replace(/```html/g, '').replace(/```/g, '');
         responseText = responseText.replace(/\\n/g, ' ');
         
+        // 1. Remove dangerous tags globally
+        const dangerousTagsRegex = /<(style|script|link|meta|title|head)[^>]*>[\s\S]*?<\/\1>/gi;
+        responseText = responseText.replace(dangerousTagsRegex, '');
+
+        // 2. Extract body content if present
         const bodyMatch = responseText.match(/<body[^>]*>([\s\S]*)<\/body>/i);
         if (bodyMatch && bodyMatch[1]) {
           responseText = bodyMatch[1];

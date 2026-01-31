@@ -12,11 +12,18 @@ const ParentLogin = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Student Login ID:', parentId);
-    // In a real app, validation would happen here
+    
     if (parentId.trim()) {
-      navigate(`/student-profile/${parentId}`);
-    } else {
-      // Ideally show an error or toast
+      // Remove 'S' (case-insensitive) and parse to integer (e.g., "S001" -> 1)
+      const cleanId = parentId.trim().replace(/^s/i, '');
+      const studentId = parseInt(cleanId, 10);
+
+      if (!isNaN(studentId)) {
+        navigate(`/student-profile/${studentId}`);
+      } else {
+        // Fallback for non-numeric IDs if valid
+        navigate(`/student-profile/${parentId}`);
+      }
     }
   };
 

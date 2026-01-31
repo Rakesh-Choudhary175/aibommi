@@ -11,6 +11,7 @@ const StudentProfile = () => {
   const navigate = useNavigate();
   const [activeSubject, setActiveSubject] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [startChat, setStartChat] = useState(false);
   const [academicData, setAcademicData] = useState({});
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +149,10 @@ const StudentProfile = () => {
             <button 
               className="login-btn" 
               style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
-              onClick={() => setShowChat(true)}
+              onClick={() => {
+                if (!startChat) setStartChat(true);
+                setShowChat(true);
+              }}
             >
               Chat with AI
             </button>
@@ -156,8 +160,8 @@ const StudentProfile = () => {
         </div>
 
         {/* Chat Side Panel */}
-        {showChat && (
-          <div className="chat-panel">
+        {startChat && (
+          <div className="chat-panel" style={{ display: showChat ? 'block' : 'none' }}>
             <ChatWindow onClose={() => setShowChat(false)} />
           </div>
         )}

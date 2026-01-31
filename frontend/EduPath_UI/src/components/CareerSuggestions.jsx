@@ -16,7 +16,13 @@ const CareerSuggestions = () => {
     "DESIGN": "0.6 * Art + 0.4 * Drawing",
     "MEDICINE": "0.4 * Biology + 0.3 * Chemistry + 0.3 * Physics",
     "SPORTS": "Physical Education",
-    "SINGING": "0.7 * choir + 0.3 * sing"
+    "SINGING": "0.7 * choir + 0.3 * sing",
+    "COMMERCE": "0.5 * Mathematics + 0.3 * Economics + 0.2 * English",
+    "DATA_SCIENCE": "0.5 * Mathematics + 0.5 * Computer Science",
+    "ARCHITECTURE": "0.4 * Mathematics + 0.4 * Art + 0.2 * Physics",
+    "LAW" : "0.5 * English + 0.4 * History + 0.2 * Mathematics",
+    "MEDIA" : "0.5 * English + 0.3 * Art/Drawing + 0.2 * Music",
+    
   };
 
   useEffect(() => {
