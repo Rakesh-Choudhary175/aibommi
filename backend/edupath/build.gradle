@@ -21,6 +21,11 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+	// MySQL driver for runtime (explicit version)
+	runtimeOnly 'com.mysql:mysql-connector-j:8.1.0'
+	// Keep H2 available for fast in-memory tests
+	testRuntimeOnly 'com.h2database:h2'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
