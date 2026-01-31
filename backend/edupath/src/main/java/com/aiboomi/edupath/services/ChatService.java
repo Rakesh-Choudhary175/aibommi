@@ -1,5 +1,6 @@
 package com.aiboomi.edupath.services;
 
+import com.aiboomi.edupath.dtos.ChatMessage;
 import com.aiboomi.edupath.entities.Profile;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class ChatService {
         this.profileService = profileService;
     }
 
-    public String processChat(Long studentId, List<com.aiboomi.edupath.dtos.ChatMessage> conversationHistory)
+    public String processChat(Long studentId, List<ChatMessage> conversationHistory)
             throws Exception {
         // 1. Fetch Profile
         Profile profile = profileService.getLatestProfileForStudent(studentId)

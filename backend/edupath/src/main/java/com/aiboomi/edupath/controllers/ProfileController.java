@@ -1,13 +1,10 @@
 package com.aiboomi.edupath.controllers;
 
-import com.aiboomi.edupath.entities.Profile;
 import com.aiboomi.edupath.services.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/students")
@@ -32,7 +29,8 @@ public class ProfileController {
     public ResponseEntity<java.util.List<com.aiboomi.edupath.dtos.ProfileDTO>> generateAll() throws Exception {
         java.util.List<com.aiboomi.edupath.entities.Profile> list = profileService.generateProfilesForAll();
         java.util.List<com.aiboomi.edupath.dtos.ProfileDTO> dtoList = new java.util.ArrayList<>();
-        for (com.aiboomi.edupath.entities.Profile p : list) dtoList.add(profileService.toDto(p));
+        for (com.aiboomi.edupath.entities.Profile p : list)
+            dtoList.add(profileService.toDto(p));
         return ResponseEntity.ok(dtoList);
     }
 
