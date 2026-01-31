@@ -304,7 +304,7 @@ public class AnalyticsService {
     }
 
     private CareerScore computeDataScience(Student s, Map<String, Double> strength) {
-        Map<String, Double> weights = Map.of("Mathematics", 0.5, "Computer Science", 0.3, "Statistics", 0.2);
+        Map<String, Double> weights = Map.of("Mathematics", 0.5, "Computer Science", 0.5);
         return computeWeightedCareer(s, Career.DATA_SCIENCE, strength, weights);
     }
 
@@ -348,9 +348,8 @@ public class AnalyticsService {
             score = clamp(numerator / currentTotalWeight, 0, 100);
         }
 
-        ConfidenceLevel confidence = (present == 3) ? ConfidenceLevel.HIGH : ConfidenceLevel.LOW;
-        if (present >= 2)
-            confidence = ConfidenceLevel.MEDIUM;
+        ConfidenceLevel confidence = (present == 3) ? ConfidenceLevel.HIGH
+                : ((present >= 2) ? ConfidenceLevel.MEDIUM : ConfidenceLevel.LOW);
 
         return new CareerScore(s, Career.ARCHITECTURE, score, confidence);
     }
