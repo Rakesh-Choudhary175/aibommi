@@ -7,6 +7,9 @@ import com.aiboomi.edupath.dtos.StudentDTO;
 import com.aiboomi.edupath.entities.AcademicRecord;
 import com.aiboomi.edupath.entities.ExtracurricularActivity;
 import com.aiboomi.edupath.entities.Student;
+import com.aiboomi.edupath.daos.CareerScoreRepository;
+import com.aiboomi.edupath.dtos.CareerScoreDTO;
+import com.aiboomi.edupath.entities.CareerScore;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -31,11 +34,13 @@ public class StudentController {
     private final StudentRepository studentRepository;
     private final AcademicRecordRepository academicRepository;
     private final ActivityRepository activityRepository;
+    private final CareerScoreRepository careerScoreRepository;
 
-    public StudentController(StudentRepository studentRepository, AcademicRecordRepository academicRepository, ActivityRepository activityRepository) {
+    public StudentController(StudentRepository studentRepository, AcademicRecordRepository academicRepository, ActivityRepository activityRepository, CareerScoreRepository careerScoreRepository) {
         this.studentRepository = studentRepository;
         this.academicRepository = academicRepository;
         this.activityRepository = activityRepository;
+        this.careerScoreRepository = careerScoreRepository;
     }
 
     @Operation(summary = "List students", description = "Returns all students",
@@ -113,4 +118,25 @@ public class StudentController {
         if (s == null) return null;
         return new StudentDTO(s.getId(), s.getStudentExternalId(), s.getName(), s.getClassNumber(), s.getDob());
     }
+
+    @Operation(summary = "List computed career scores", description = "Returns computed career scores (score + confidence) for a student. Returns 404 if student not found",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Career scores",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = com.aiboomi.edupath.dtos.CareerScoreDTO.class)),
+                                    examples = @ExampleObject(value = "[{\"studentId\":1,\"career\":\"ENGINEERING\",\"score\":82.4,\"confidence\":\"HIGH\"}]")
+                            )
+                    ),
+                    @ApiResponse(responseCode = "404", description = "Student not found")
+            }
+    )
+    @GetMapping("/{id}/careers")
+    @Transactional(readOnly = true)
+    public ResponseEntity<java.util.List<CareerScoreDTO>> getCareers(@PathVariable("id") Long id) {
+        if (!studentRepository.existsById(id)) return ResponseEntity.notFound().build();
+        java.util.List<CareerScore> list = careerScoreRepository.findByStudent_Id(id);
+        java.util.List<CareerScoreDTO> dto = list.stream().map(cs -> new CareerScoreDTO(cs.getStudent().getId(), cs.getCareer(), cs.getScore(), cs.getConfidence())).collect(Collectors.toList());
+        return ResponseEntity.ok(dto);
+    }
 }
+

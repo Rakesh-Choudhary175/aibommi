@@ -31,6 +31,9 @@ dependencies {
 	// Keep H2 available for fast in-memory tests
 	testRuntimeOnly 'com.h2database:h2'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	// Standard testing dependency (includes WebMvcTest, MockBean, Mockito, AssertJ etc.)
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// Additional focused starters (ok to keep)
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
