@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import LoginPage from './components/LoginPage';
 import StudentProfile from './components/StudentProfile';
 import AdminDashboard from './components/AdminDashboard';
+import CareerSuggestions from './components/CareerSuggestions';
 import './App.css';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/student-profile/:studentId" element={<StudentProfile />} />
+        <Route path="/student-profile/:studentId/career" element={<CareerSuggestions />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />

@@ -163,7 +163,7 @@ body, html {
 .profile-card {
   transition: all 0.5s ease;
   flex: 1;
-  max-width: 800px; /* Default width */
+  max-width: 95vw; /* Utilizing full screen width as requested */
 }
 
 .split-view .profile-card {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ChatWindow from './ChatWindow';
@@ -8,6 +8,7 @@ import '../Login.css';
 
 const StudentProfile = () => {
   const { studentId } = useParams();
+  const navigate = useNavigate();
   const [activeSubject, setActiveSubject] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [academicData, setAcademicData] = useState({});
@@ -94,7 +95,7 @@ const StudentProfile = () => {
             Student Performance Profile {studentName && `- ${studentName}`}
           </h1>
           
-          <div className="login-toggle" style={{ flexWrap: 'wrap', gap: '5px' }}>
+          <div className="login-toggle" style={{ gap: '5px', overflowX: 'auto' }}>
             {subjects.map((subject) => (
               <button
                 key={subject}
@@ -135,23 +136,17 @@ const StudentProfile = () => {
             )}
           </div>
 
+
           <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center' }}>
             <button 
               className="login-btn" 
               style={{ padding: '1rem 3rem', fontSize: '1.2rem' }}
-              onClick={() => setShowChat(true)}
+              onClick={() => navigate(`/student-profile/${studentId}/career`)}
             >
               Suggest Career Path
             </button>
           </div>
         </div>
-
-        {/* Chat Side Panel */}
-        {showChat && (
-          <div className="chat-panel">
-            <ChatWindow onClose={() => setShowChat(false)} />
-          </div>
-        )}
 
       </div>
     </div>
