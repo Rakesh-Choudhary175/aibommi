@@ -1,6 +1,7 @@
 package com.aiboomi.edupath.entities;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "academic_record", indexes = {@Index(columnList = "student_id, year, subject", name = "idx_academic_student_year_subject")})
@@ -12,6 +13,7 @@ public class AcademicRecord {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
+    @JsonIgnore
     private Student student;
 
     @Column(name = "year")
