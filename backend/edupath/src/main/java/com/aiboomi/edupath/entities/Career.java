@@ -5,5 +5,10 @@ public enum Career {
     DESIGN,
     MEDICINE,
     SPORTS,
-    SINGING
+    SINGING,
+    COMMERCE,
+    DATA_SCIENCE,
+    ARCHITECTURE,
+    LAW,
+    MEDIA
 }

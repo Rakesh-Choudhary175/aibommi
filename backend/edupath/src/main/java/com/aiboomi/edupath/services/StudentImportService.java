@@ -1,4 +1,4 @@
-    package com.aiboomi.edupath.services;
+package com.aiboomi.edupath.services;
 
 import com.aiboomi.edupath.daos.AcademicRecordRepository;
 import com.aiboomi.edupath.daos.ActivityRepository;
@@ -26,7 +26,8 @@ public class StudentImportService {
     private final AcademicRecordRepository academicRepository;
     private final ActivityRepository activityRepository;
 
-    public StudentImportService(StudentRepository studentRepository, AcademicRecordRepository academicRepository, ActivityRepository activityRepository) {
+    public StudentImportService(StudentRepository studentRepository, AcademicRecordRepository academicRepository,
+            ActivityRepository activityRepository) {
         this.studentRepository = studentRepository;
         this.academicRepository = academicRepository;
         this.activityRepository = activityRepository;
@@ -52,7 +53,8 @@ public class StudentImportService {
             int lastCell = header.getLastCellNum();
             for (int c = 0; c < lastCell; c++) {
                 String h = getCellString(header.getCell(c));
-                if (h == null) continue;
+                if (h == null)
+                    continue;
                 String hl = h.toLowerCase();
                 if (idIdx == -1 && hl.contains("student") && hl.contains("id")) {
                     idIdx = c;
@@ -77,15 +79,21 @@ public class StudentImportService {
 
                 // treat remaining columns as subjects (clean header text)
                 String subj = h.replaceAll("(?i)\\bmarks?\\b|\\bma\\b", "").trim();
-                if (subj.isEmpty()) subj = h.trim();
+                if (subj.isEmpty())
+                    subj = h.trim();
+                subj = normalizeSubjectName(subj);
                 subjectCols.put(c, subj);
             }
 
             // Fallbacks
-            if (idIdx == -1) idIdx = 0;
-            if (nameIdx == -1) nameIdx = 1;
-            if (classIdx == -1 && lastCell >= 2) classIdx = lastCell - 2;
-            if (yearIdx == -1 && lastCell >= 1) yearIdx = lastCell - 1;
+            if (idIdx == -1)
+                idIdx = 0;
+            if (nameIdx == -1)
+                nameIdx = 1;
+            if (classIdx == -1 && lastCell >= 2)
+                classIdx = lastCell - 2;
+            if (yearIdx == -1 && lastCell >= 1)
+                yearIdx = lastCell - 1;
 
             // First pass: parse rows into memory and compute per-(year,subject) maxima
             class ParsedRow {
@@ -104,7 +112,8 @@ public class StudentImportService {
 
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
-                if (isRowEmpty(currentRow)) continue;
+                if (isRowEmpty(currentRow))
+                    continue;
 
                 ParsedRow pr = new ParsedRow();
                 pr.studentId = getCellString(currentRow.getCell(idIdx));
@@ -116,7 +125,8 @@ public class StudentImportService {
 
                 for (java.util.Map.Entry<Integer, String> ent : subjectCols.entrySet()) {
                     Double marks = getCellDouble(currentRow.getCell(ent.getKey()));
-                    if (marks == null) continue;
+                    if (marks == null)
+                        continue;
                     pr.marksByCol.put(ent.getKey(), marks);
 
                     String subj = ent.getValue();
@@ -128,7 +138,8 @@ public class StudentImportService {
                 }
 
                 // only add if at least one mark exists
-                if (!pr.marksByCol.isEmpty()) parsedRows.add(pr);
+                if (!pr.marksByCol.isEmpty())
+                    parsedRows.add(pr);
             }
 
             // Second pass: create AcademicRecord instances using per-(year,subject) maxima
@@ -155,7 +166,8 @@ public class StudentImportService {
                         student.setClassNumber(classNum);
                         changed = true;
                     }
-                    if (changed) studentRepository.save(student);
+                    if (changed)
+                        studentRepository.save(student);
                 }
 
                 String yearKey = (pr.year == null) ? "ALL" : String.valueOf(pr.year);
@@ -174,22 +186,29 @@ public class StudentImportService {
     }
 
     private boolean isRowEmpty(Row row) {
-        if (row == null) return true;
+        if (row == null)
+            return true;
         int last = row.getLastCellNum();
-        if (last <= 0) return true;
+        if (last <= 0)
+            return true;
         for (int i = 0; i < last; i++) {
             Cell cell = row.getCell(i);
-            if (cell == null) continue;
-            if (cell.getCellType() == CellType.BLANK) continue;
+            if (cell == null)
+                continue;
+            if (cell.getCellType() == CellType.BLANK)
+                continue;
             String v = getCellString(cell);
-            if (v != null && !v.trim().isEmpty()) return false;
-            if (cell.getCellType() == CellType.NUMERIC) return false;
+            if (v != null && !v.trim().isEmpty())
+                return false;
+            if (cell.getCellType() == CellType.NUMERIC)
+                return false;
         }
         return true;
     }
 
     private Integer tryParseInt(String s) {
-        if (s == null) return null;
+        if (s == null)
+            return null;
         try {
             return Integer.parseInt(s.trim());
         } catch (NumberFormatException ex) {
@@ -198,7 +217,8 @@ public class StudentImportService {
     }
 
     private Cell getCellIfExists(Row r, Integer idx) {
-        if (r == null || idx == null || idx < 0) return null;
+        if (r == null || idx == null || idx < 0)
+            return null;
         try {
             return r.getCell(idx);
         } catch (IllegalArgumentException ex) {
@@ -209,26 +229,32 @@ public class StudentImportService {
     private Integer firstIndex(java.util.Map<String, Integer> indices, String... keys) {
         for (String k : keys) {
             Integer v = indices.get(k.toLowerCase());
-            if (v != null) return v;
+            if (v != null)
+                return v;
         }
         return null;
     }
 
     private String getCellString(Cell cell) {
-        if (cell == null) return null;
-        if (cell.getCellType() == CellType.STRING) return cell.getStringCellValue().trim();
+        if (cell == null)
+            return null;
+        if (cell.getCellType() == CellType.STRING)
+            return cell.getStringCellValue().trim();
         if (cell.getCellType() == CellType.NUMERIC) {
             double d = cell.getNumericCellValue();
             long l = (long) d;
-            if (d == l) return String.valueOf(l);
+            if (d == l)
+                return String.valueOf(l);
             return String.valueOf(d);
         }
         return null;
     }
 
     private Integer getCellInteger(Cell cell) {
-        if (cell == null) return null;
-        if (cell.getCellType() == CellType.NUMERIC) return (int) cell.getNumericCellValue();
+        if (cell == null)
+            return null;
+        if (cell.getCellType() == CellType.NUMERIC)
+            return (int) cell.getNumericCellValue();
         if (cell.getCellType() == CellType.STRING) {
             try {
                 return Integer.parseInt(cell.getStringCellValue().trim());
@@ -240,8 +266,10 @@ public class StudentImportService {
     }
 
     private Double getCellDouble(Cell cell) {
-        if (cell == null) return null;
-        if (cell.getCellType() == CellType.NUMERIC) return cell.getNumericCellValue();
+        if (cell == null)
+            return null;
+        if (cell.getCellType() == CellType.NUMERIC)
+            return cell.getNumericCellValue();
         if (cell.getCellType() == CellType.STRING) {
             try {
                 return Double.parseDouble(cell.getStringCellValue().trim());
@@ -252,7 +280,8 @@ public class StudentImportService {
         return null;
     }
 
-    // Extracurricular import (separate Excel with columns like student_id, student_name, year, activity, metric_value, metric_unit, level, remarks)
+    // Extracurricular import (separate Excel with columns like student_id,
+    // student_name, year, activity, metric_value, metric_unit, level, remarks)
     @Transactional
     public List<ExtracurricularActivity> importExtracurricularFromExcel(MultipartFile file) throws IOException {
         List<ExtracurricularActivity> out = new ArrayList<>();
@@ -260,7 +289,8 @@ public class StudentImportService {
         try (InputStream is = file.getInputStream(); Workbook workbook = WorkbookFactory.create(is)) {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
-            if (!rows.hasNext()) return out;
+            if (!rows.hasNext())
+                return out;
 
             Row header = rows.next();
 
@@ -269,7 +299,8 @@ public class StudentImportService {
             int last = header.getLastCellNum();
             for (int i = 0; i < last; i++) {
                 String h = getCellString(header.getCell(i));
-                if (h == null) continue;
+                if (h == null)
+                    continue;
                 indices.put(h.toLowerCase().trim(), i);
             }
 
@@ -286,19 +317,24 @@ public class StudentImportService {
 
             while (rows.hasNext()) {
                 Row r = rows.next();
-                if (isRowEmpty(r)) continue;
+                if (isRowEmpty(r))
+                    continue;
                 String studentId = getCellString(getCellIfExists(r, studentIdIdx));
                 String studentName = getCellString(getCellIfExists(r, studentNameIdx));
                 Integer year = getCellInteger(getCellIfExists(r, indices.getOrDefault("year", -1)));
                 String activityName = getCellString(getCellIfExists(r, activityIdx));
-                Double metricValue = getCellDouble(getCellIfExists(r, indices.getOrDefault("metric_value", indices.getOrDefault("metric", -1))));
-                String metricUnit = getCellString(getCellIfExists(r, indices.getOrDefault("metric_unit", indices.getOrDefault("metricunit", -1))));
+                Double metricValue = getCellDouble(
+                        getCellIfExists(r, indices.getOrDefault("metric_value", indices.getOrDefault("metric", -1))));
+                String metricUnit = getCellString(getCellIfExists(r,
+                        indices.getOrDefault("metric_unit", indices.getOrDefault("metricunit", -1))));
                 String levelStr = getCellString(getCellIfExists(r, indices.getOrDefault("level", -1)));
                 String remarks = getCellString(getCellIfExists(r, indices.getOrDefault("remarks", -1)));
-                String categoryStr = getCellString(getCellIfExists(r, firstIndex(indices, "category", "activity_type")));
+                String categoryStr = getCellString(
+                        getCellIfExists(r, firstIndex(indices, "category", "activity_type")));
 
                 Student student = null;
-                if (studentId != null) student = studentRepository.findByStudentExternalId(studentId).orElse(null);
+                if (studentId != null)
+                    student = studentRepository.findByStudentExternalId(studentId).orElse(null);
                 if (student == null) {
                     student = new Student(studentId, studentName, null, null);
                     student = studentRepository.save(student);
@@ -320,11 +356,50 @@ public class StudentImportService {
                     }
                 }
 
-                ExtracurricularActivity act = new ExtracurricularActivity(student, year, category, activityName, metricValue, metricUnit, level, remarks);
+                ExtracurricularActivity act = new ExtracurricularActivity(student, year, category, activityName,
+                        metricValue, metricUnit, level, remarks);
                 out.add(act);
             }
 
             return activityRepository.saveAll(out);
         }
+    }
+
+    private String normalizeSubjectName(String input) {
+        if (input == null)
+            return "";
+        String lower = input.toLowerCase().trim();
+
+        // Handle specific cases first to avoid partial match overlaps
+        if (lower.contains("physical education") || lower.contains("phy ed") || lower.contains("p.e.")
+                || lower.equals("pe")) {
+            return "Physical Education";
+        }
+
+        if (lower.contains("math"))
+            return "Mathematics";
+        if (lower.contains("eco"))
+            return "Economics";
+        if (lower.contains("stat"))
+            return "Statistics";
+        if (lower.contains("hist"))
+            return "History";
+
+        // Physics needs to be checked after Physical Education
+        if (lower.contains("phys") || lower.contains("phy"))
+            return "Physics";
+
+        if (lower.contains("bio"))
+            return "Biology";
+        if (lower.contains("chem"))
+            return "Chemistry";
+        if (lower.contains("eng") || lower.contains("lang"))
+            return "English";
+        if (lower.contains("comp") || lower.contains("cs"))
+            return "Computer Science";
+        if (lower.contains("art") || lower.contains("draw"))
+            return "Art";
+
+        return input;
     }
 }

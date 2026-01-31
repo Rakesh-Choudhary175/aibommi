@@ -18,6 +18,11 @@ public class DataInitializer {
                 repo.save(new CareerDomain(3, "COMMERCE", "Business and Commerce"));
                 repo.save(new CareerDomain(4, "DESIGN", "Design and Creative fields"));
                 repo.save(new CareerDomain(5, "SPORTS", "Professional sports and physical education"));
+                repo.save(new CareerDomain(6, "SINGING", "Music and Performance"));
+                repo.save(new CareerDomain(7, "DATA_SCIENCE", "Data Science and AI"));
+                repo.save(new CareerDomain(8, "ARCHITECTURE", "Architecture and Planning"));
+                repo.save(new CareerDomain(9, "LAW", "Law and Legal Studies"));
+                repo.save(new CareerDomain(10, "MEDIA", "Media and Communications"));
             }
         };
     }

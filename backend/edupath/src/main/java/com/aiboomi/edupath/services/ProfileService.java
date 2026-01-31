@@ -22,7 +22,8 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final ObjectMapper objectMapper;
 
-    public ProfileService(StudentRepository studentRepository, CareerScoreRepository careerScoreRepository, ActivityRepository activityRepository, ProfileRepository profileRepository, ObjectMapper objectMapper) {
+    public ProfileService(StudentRepository studentRepository, CareerScoreRepository careerScoreRepository,
+            ActivityRepository activityRepository, ProfileRepository profileRepository, ObjectMapper objectMapper) {
         this.studentRepository = studentRepository;
         this.careerScoreRepository = careerScoreRepository;
         this.activityRepository = activityRepository;
@@ -36,12 +37,17 @@ public class ProfileService {
             Career.DESIGN, List.of("Art / Drawing", "Mathematics"),
             Career.MEDICINE, List.of("Biology", "Chemistry", "Physics"),
             Career.SPORTS, List.of("Physical Education"),
-            Career.SINGING, List.of("Music")
-    );
+            Career.SINGING, List.of("Music"),
+            Career.COMMERCE, List.of("Mathematics", "Economics", "English"),
+            Career.DATA_SCIENCE, List.of("Mathematics", "Computer Science", "Statistics"),
+            Career.ARCHITECTURE, List.of("Mathematics", "Art / Drawing", "Physics"),
+            Career.LAW, List.of("English", "History", "Mathematics"),
+            Career.MEDIA, List.of("English", "Art / Drawing", "Music"));
 
     @Transactional
     public Profile generateProfileForStudent(Long studentId) throws Exception {
-        Student s = studentRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("Student not found"));
+        Student s = studentRepository.findById(studentId)
+                .orElseThrow(() -> new IllegalArgumentException("Student not found"));
         List<CareerScore> scores = careerScoreRepository.findByStudent_Id(studentId);
         Map<Career, CareerScore> scoreMap = scores.stream().collect(Collectors.toMap(CareerScore::getCareer, cs -> cs));
 
@@ -62,22 +68,31 @@ public class ProfileService {
             // For Sports and Singing, add extracurriculars if present
             if (c == Career.SPORTS) {
                 // check for running/swimming activities
-                boolean hasRunning = activityRepository.findByStudent_Id(studentId).stream().anyMatch(a -> a.getName() != null && a.getName().toLowerCase().contains("run"));
-                boolean hasSwimming = activityRepository.findByStudent_Id(studentId).stream().anyMatch(a -> a.getName() != null && a.getName().toLowerCase().contains("swim"));
-                if (hasRunning) basedOn.add("Running");
-                if (hasSwimming) basedOn.add("Swimming");
+                boolean hasRunning = activityRepository.findByStudent_Id(studentId).stream()
+                        .anyMatch(a -> a.getName() != null && a.getName().toLowerCase().contains("run"));
+                boolean hasSwimming = activityRepository.findByStudent_Id(studentId).stream()
+                        .anyMatch(a -> a.getName() != null && a.getName().toLowerCase().contains("swim"));
+                if (hasRunning)
+                    basedOn.add("Running");
+                if (hasSwimming)
+                    basedOn.add("Swimming");
             }
             if (c == Career.SINGING) {
-                boolean hasChoir = activityRepository.findByStudent_Id(studentId).stream().anyMatch(a -> a.getName() != null && a.getName().toLowerCase().contains("choir"));
-                if (hasChoir) basedOn.add("Choir Singing");
+                boolean hasChoir = activityRepository.findByStudent_Id(studentId).stream()
+                        .anyMatch(a -> a.getName() != null && a.getName().toLowerCase().contains("choir"));
+                if (hasChoir)
+                    basedOn.add("Choir Singing");
             }
 
             entry.put("basedOn", basedOn);
-            output.put(c.name().substring(0,1).toUpperCase() + c.name().substring(1).toLowerCase(), entry);
+            output.put(c.name().substring(0, 1).toUpperCase() + c.name().substring(1).toLowerCase(), entry);
         }
 
         // pick top 2 careers by score
-        List<CareerScore> sorted = scores.stream().sorted(Comparator.comparingDouble((CareerScore cs)-> cs.getScore()==null?-1:cs.getScore()).reversed()).collect(Collectors.toList());
+        List<CareerScore> sorted = scores
+                .stream().sorted(Comparator
+                        .comparingDouble((CareerScore cs) -> cs.getScore() == null ? -1 : cs.getScore()).reversed())
+                .collect(Collectors.toList());
         String narrative = buildNarrative(sorted);
 
         String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(output);
@@ -89,15 +104,20 @@ public class ProfileService {
     }
 
     private String buildNarrative(List<CareerScore> sorted) {
-        if (sorted.isEmpty()) return "No career scores available.";
+        if (sorted.isEmpty())
+            return "No career scores available.";
         CareerScore primary = sorted.get(0);
         CareerScore secondary = sorted.size() > 1 ? sorted.get(1) : null;
 
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Primary: %s (score=%.1f, confidence=%s).", primary.getCareer().name(), primary.getScore()==null?0.0:primary.getScore(), primary.getConfidence()==null?"UNKNOWN":primary.getConfidence().name()));
+        sb.append(String.format("Primary: %s (score=%.1f, confidence=%s).", primary.getCareer().name(),
+                primary.getScore() == null ? 0.0 : primary.getScore(),
+                primary.getConfidence() == null ? "UNKNOWN" : primary.getConfidence().name()));
         if (secondary != null) {
             sb.append(" ");
-            sb.append(String.format("Secondary: %s (score=%.1f, confidence=%s).", secondary.getCareer().name(), secondary.getScore()==null?0.0:secondary.getScore(), secondary.getConfidence()==null?"UNKNOWN":secondary.getConfidence().name()));
+            sb.append(String.format("Secondary: %s (score=%.1f, confidence=%s).", secondary.getCareer().name(),
+                    secondary.getScore() == null ? 0.0 : secondary.getScore(),
+                    secondary.getConfidence() == null ? "UNKNOWN" : secondary.getConfidence().name()));
         }
         // Others - one line max
         List<String> others = sorted.stream().skip(2).map(cs -> cs.getCareer().name()).collect(Collectors.toList());
@@ -120,7 +140,8 @@ public class ProfileService {
         } catch (Exception e) {
             parsed = p.getProfileJson();
         }
-        return new com.aiboomi.edupath.dtos.ProfileDTO(p.getId(), p.getStudent().getId(), parsed, p.getNarrative(), p.getCreatedAt());
+        return new com.aiboomi.edupath.dtos.ProfileDTO(p.getId(), p.getStudent().getId(), parsed, p.getNarrative(),
+                p.getCreatedAt());
     }
 
     @Transactional
