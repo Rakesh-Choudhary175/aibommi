@@ -48,6 +48,6 @@ public class ChatService {
         }
 
         // 4. Call FastRouter (Anthropic model via FastRouter)
-        return fastRouterClient.chat(messages, "anthropic/claude-sonnet-4-20250514", 0.7, 1000);
+        return fastRouterClient.chat(messages, "anthropic/claude-sonnet-4-20250514", 0.7, 1500);
     }
 }
