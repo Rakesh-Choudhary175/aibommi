@@ -133,7 +133,6 @@ public class StudentImportService {
 
             // Second pass: create AcademicRecord instances using per-(year,subject) maxima
             java.util.List<AcademicRecord> academicRecords = new java.util.ArrayList<>();
-            java.util.Map<String, Student> studentCache = new java.util.HashMap<>();
 
             for (ParsedRow pr : parsedRows) {
                 // ensure Student exists / updated

@@ -102,7 +102,6 @@ public class AnalyticsService {
         for (Student s : students) {
             Map<String, Double> strengths = computeStrength(s);
             List<ExtracurricularActivity> activities = activityRepository.findByStudent_Id(s.getId());
-            Map<String, List<ExtracurricularActivity>> actsByName = activities.stream().collect(Collectors.groupingBy(a -> (a.getName() == null ? "" : a.getName().toLowerCase())));
             // ENGINEERING
             CareerScore eng = computeEngineering(s, strengths, activities);
             saved.add(careerScoreRepository.save(eng));
