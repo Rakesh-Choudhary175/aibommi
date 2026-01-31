@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
     adminId: '',
     password: '',
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -16,7 +18,8 @@ const AdminLogin = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Admin Login Data:', formData);
-    // Add login logic here
+    // Add validation logic here if needed
+    navigate('/admin-dashboard');
   };
 
   return (

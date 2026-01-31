@@ -13,7 +13,11 @@ const ParentLogin = () => {
     e.preventDefault();
     console.log('Student Login ID:', parentId);
     // In a real app, validation would happen here
-    navigate('/student-profile');
+    if (parentId.trim()) {
+      navigate(`/student-profile/${parentId}`);
+    } else {
+      // Ideally show an error or toast
+    }
   };
 
   return (

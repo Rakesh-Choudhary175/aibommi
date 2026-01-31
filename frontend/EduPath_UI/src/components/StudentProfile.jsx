@@ -1,35 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import ChatWindow from './ChatWindow';
 import '../Login.css';
 
-const data = {
-  Maths: [
-    { year: '2021', score: 65 },
-    { year: '2022', score: 70 },
-    { year: '2023', score: 75 },
-    { year: '2024', score: 82 },
-    { year: '2025', score: 88 },
-  ],
-  Science: [
-    { year: '2021', score: 60 },
-    { year: '2022', score: 65 },
-    { year: '2023', score: 72 },
-    { year: '2024', score: 78 },
-    { year: '2025', score: 85 },
-  ],
-  Arts: [
-    { year: '2021', score: 80 },
-    { year: '2022', score: 82 },
-    { year: '2023', score: 85 },
-    { year: '2024', score: 88 },
-    { year: '2025', score: 92 },
-  ],
-};
-
 const StudentProfile = () => {
-  const [activeSubject, setActiveSubject] = useState('Maths');
+  const { studentId } = useParams();
+  const [activeSubject, setActiveSubject] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [academicData, setAcademicData] = useState({});
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [studentName, setStudentName] = useState('');
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        const [academicsRes, studentRes] = await Promise.all([
+          axios.get(`http://localhost:8080/api/students/${studentId}/academics`),
+          axios.get(`http://localhost:8080/api/students/${studentId}`)
+        ]);
+        
+        processData(academicsRes.data);
+        if (studentRes.data && studentRes.data.name) {
+          setStudentName(studentRes.data.name);
+        }
+      } catch (error) {
+        console.error("Error fetching student data", error);
+        toast.error("Failed to load student data.");
+        setLoading(false);
+      }
+    };
+
+    if (studentId) {
+      fetchStudentData();
+    }
+  }, [studentId]);
+
+  const processData = (rawData) => {
+    if (!rawData || !Array.isArray(rawData)) return;
+
+    const groupedData = {};
+    const subjectList = new Set();
+    
+    // Process and sort by year
+    const sortedData = [...rawData].sort((a, b) => a.year - b.year);
+
+    sortedData.forEach(item => {
+      const subject = item.subject;
+      subjectList.add(subject);
+      
+      if (!groupedData[subject]) {
+        groupedData[subject] = [];
+      }
+
+      // Calculate percentage and format
+      const percentage = (item.marks / item.maxMarks) * 100;
+      
+      groupedData[subject].push({
+        year: item.year.toString(),
+        score: Math.round(percentage),
+        rawMarks: item.marks,
+        maxMarks: item.maxMarks
+      });
+    });
+
+    const subjectsArr = Array.from(subjectList);
+    setAcademicData(groupedData);
+    setSubjects(subjectsArr);
+    if (subjectsArr.length > 0) {
+      setActiveSubject(subjectsArr[0]);
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="login-page-container">
+        <div style={{ color: 'white', fontSize: '1.5rem' }}>Loading Student Profile...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="login-page-container">
@@ -37,14 +90,17 @@ const StudentProfile = () => {
         
         {/* Main Content Area (Graph & Controls) */}
         <div className="login-card profile-card">
-          <h1 className="app-title">Student Performance Profile</h1>
+          <h1 className="app-title">
+            Student Performance Profile {studentName && `- ${studentName}`}
+          </h1>
           
-          <div className="login-toggle">
-            {Object.keys(data).map((subject) => (
+          <div className="login-toggle" style={{ flexWrap: 'wrap', gap: '5px' }}>
+            {subjects.map((subject) => (
               <button
                 key={subject}
                 className={`toggle-btn ${activeSubject === subject ? 'active' : ''}`}
                 onClick={() => setActiveSubject(subject)}
+                style={{ flex: 'none' }} 
               >
                 {subject}
               </button>
@@ -52,24 +108,31 @@ const StudentProfile = () => {
           </div>
 
           <div className="chart-container" style={{ height: '300px', margin: '2rem 0' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data[activeSubject]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="year" stroke="#d1d5db" />
-                <YAxis stroke="#d1d5db" />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e1b4b', border: '1px solid rgba(255,255,255,0.2)', color: '#fff' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="#4f46e5" 
-                  strokeWidth={3} 
-                  dot={{ r: 6, fill: '#818cf8', strokeWidth: 2 }} 
-                  activeDot={{ r: 8 }} 
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {activeSubject && academicData[activeSubject] ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={academicData[activeSubject]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis dataKey="year" stroke="#d1d5db" />
+                  <YAxis stroke="#d1d5db" domain={[0, 100]} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1e1b4b', border: '1px solid rgba(255,255,255,0.2)', color: '#fff' }}
+                    formatter={(value, name, props) => [`${value}% (${props.payload.rawMarks}/${props.payload.maxMarks})`, "Score"]}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="score" 
+                    stroke="#4f46e5" 
+                    strokeWidth={3} 
+                    dot={{ r: 6, fill: '#818cf8', strokeWidth: 2 }} 
+                    activeDot={{ r: 8 }} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: 'var(--text-dim)' }}>
+                    No data available for this subject.
+                </div>
+            )}
           </div>
 
           <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center' }}>
