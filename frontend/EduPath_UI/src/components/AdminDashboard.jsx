@@ -96,6 +96,7 @@ const AdminDashboard = () => {
     try {
       // Assuming it's a POST request to trigger analysis
       await axios.post("http://localhost:8080/api/students/analyze");
+      await axios.post("http://localhost:8080/api/students/generate-profiles");
       setAnalysisStatus('success');
       toast.success("Data analysis completed successfully!");
     } catch (error) {
